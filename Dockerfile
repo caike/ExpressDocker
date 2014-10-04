@@ -6,15 +6,14 @@ RUN   rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-
 # Install Node.js and npm
 RUN   yum install -y npm
 
-# Creates a new folder on the container
-VOLUME /src
-# Copies everything from
-# the host /src to the container's /src
-ADD /src /src
+ADD /src/package.json /tmp/package.json
+ADD /src/npm-shrinkwrap.json /tmp/npm-shrinkwrap.json
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
 
-# Installs dependencies
-RUN cd /src; npm install
+WORKDIR /opt/app
+ADD /src /opt/app
 
 EXPOSE  8080
-CMD ["node", "/src/app.js"]
+CMD ["node", "app.js"]
 
